@@ -7,10 +7,10 @@
     "module": "es2015",
     "moduleResolution": "node",
     "outDir": "dist",
-    "sourceMap": true,
+    "sourceMap": false,
     "strict": true,
     "target": "es2015"
   },
   "include": ["src"],
-  "exclude": ["src/**/*.test.*"]
+  "exclude": ["node_modules", "src/**/*.test.*"]
 }

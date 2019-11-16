@@ -32,6 +32,9 @@
     "node": ">=10",
     "npm": ">=6"
   },
+  "files": [
+    "dist"
+  ],
   "husky": {
     "hooks": {
       "pre-commit": [
@@ -70,8 +73,13 @@
     "lint": "eslint ./src/**/*",
     "lint:fix": "eslint --fix ./src/**/*",
     "lint:staged": "lint-staged",
+    "postversion": "git push && git push --tags",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
     "prettier": "prettier --write '*.{js,ts,jsx,tsx,json,md}'",
-    "test": "jest"
+    "test": "jest",
+    "version": "npm run lint:fix && git add -A src"
   },
+  "types": "dist/types/index.d.ts",
   "version": "0.0.1"
 }
