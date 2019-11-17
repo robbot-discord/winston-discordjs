@@ -77,8 +77,8 @@
     "lint:fix": "eslint --fix ./src/**/*",
     "lint:staged": "lint-staged",
     "postversion": "git push --tags",
-    "prepare": "npm run clean",
-    "prepublishOnly": "npm-run-all --parallel build test lint",
+    "prepare": "npm-run-all clean build",
+    "prepublishOnly": "npm-run-all --parallel test lint",
     "prettier": "prettier --write '*.{js,ts,jsx,tsx,json,md}'",
     "test": "jest",
     "version": "npm run lint:fix && git add -A src"
