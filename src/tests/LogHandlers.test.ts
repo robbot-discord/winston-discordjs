@@ -5,7 +5,7 @@ import {
   handleObject,
   handleInfo,
 } from "../LogHandlers"
-import { TransformableInfo } from "logform"
+import { format, TransformableInfo } from "logform"
 
 describe("LogHandlers", () => {
   const transformableInfo: TransformableInfo = {
@@ -121,11 +121,19 @@ describe("LogHandlers", () => {
       )
     })
 
+    it("handles TransformableInfo with format", () => {
+      expect(
+        handleObject(
+          transformableInfo,
+          format.combine(format.json(), format.simple(), format.timestamp())
+        )
+      ).toBe(JSON.stringify(transformableInfo))
+    })
+
     it("handles Errors without stack", () => {
       const errorWithoutStack = new Error("error message")
-      expect(handleObject(errorWithoutStack)).toBe(
-        JSON.stringify(errorWithoutStack)
-      )
+      errorWithoutStack.stack = undefined
+      expect(handleObject(errorWithoutStack)).toBe(errorWithoutStack.toString())
     })
 
     it("handles Errors with stack", () => {
@@ -136,11 +144,11 @@ describe("LogHandlers", () => {
 
     it("handles objects with a toString() function", () => {
       expect(
-        handleObject(
-          Object.assign({}, function toString() {
+        handleObject({
+          toString: function() {
             return "Hello World!"
-          })
-        )
+          },
+        })
       ).toBe("Hello World!")
     })
 
@@ -163,6 +171,11 @@ describe("LogHandlers", () => {
 
     it("handles functions that returns boolean", () => {
       expect(handleInfo(() => false)).toBe("false")
+    })
+
+    it("handles object", () => {
+      const testObject = { someProperty: "someValue" }
+      expect(handleInfo(testObject)).toBe(testObject.toString())
     })
   })
 })

@@ -1,5 +1,7 @@
 import Transport from "winston-transport"
 import { TextChannel, Client } from "discord.js"
+import TransportStream from "winston-transport"
+import { handleInfo } from "./LogHandlers"
 
 export interface DiscordTransportStreamOptions
   extends Transport.TransportStreamOptions {
@@ -8,7 +10,7 @@ export interface DiscordTransportStreamOptions
   discordChannel?: string | TextChannel
 }
 
-export class DiscordTransport extends Transport {
+export class DiscordTransport extends TransportStream {
   discordChannel?: TextChannel
   discordClient?: Client
 
@@ -16,12 +18,15 @@ export class DiscordTransport extends Transport {
     super(opts)
 
     if (opts) {
-      const { discordClient, discordChannel, discordToken } = opts
-      if (discordClient) {
-        this.discordClient = discordClient
+      const { discordChannel, discordToken } = opts
+      if (opts.discordClient) {
+        this.discordClient = opts.discordClient
       } else {
         if (discordToken) {
           this.discordClient = new Client()
+          this.discordClient.on("error", error => {
+            this.emit("warn", error)
+          })
           this.discordClient.login(discordToken)
         }
       }
@@ -29,8 +34,8 @@ export class DiscordTransport extends Transport {
       if (discordChannel) {
         if (discordChannel instanceof TextChannel) {
           this.discordChannel = discordChannel
-        } else if (discordClient && typeof discordChannel === "string") {
-          const channel = discordClient.channels.find("id", discordChannel)
+        } else if (this.discordClient && typeof discordChannel === "string") {
+          const channel = this.discordClient.channels.get(discordChannel)
 
           if (channel instanceof TextChannel) {
             this.discordChannel = channel
@@ -40,28 +45,30 @@ export class DiscordTransport extends Transport {
     }
   }
 
-  log(info: any, callback: () => void): void {
+  log(info: any, callback?: () => void): void {
     setImmediate(() => {
       this.emit("logged", info)
     })
 
-    if (this.discordChannel) {
-      this.discordChannel.sendMessage(info)
+    if (!this.silent && info) {
+      const logMessage = handleInfo(info, this.format, this.level)
+
+      if (this.discordChannel && logMessage) {
+        this.discordChannel.sendMessage(logMessage).catch(error => {
+          this.emit("warn", error)
+        })
+      }
     }
 
-    callback()
+    if (callback && typeof callback === "function") {
+      callback()
+    }
   }
 
-  logv(info: any, callback: () => void): void {
-    setImmediate(() => {
-      this.emit("logged", info)
-    })
-
-    if (this.discordChannel) {
-      this.discordChannel.sendMessage(info)
+  close(): void {
+    if (this.discordClient) {
+      this.discordClient.destroy()
     }
-
-    callback()
   }
 }
 

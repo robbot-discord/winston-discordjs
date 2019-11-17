@@ -34,28 +34,23 @@ export const handleObject = (
   format?: Format,
   level?: string
 ): string | undefined => {
-  switch (info.constructor) {
-    case Error && Boolean(info.stack): {
-      return info.stack
-    }
-    case isTransformableInfo(info): {
-      if (format) {
-        const formattedInfo = format.transform(info)
-        if (isTransformableInfo(formattedInfo)) {
-          return handleLogform(formattedInfo, level)
-        } else {
-          return handlePrimitive(formattedInfo)
-        }
+  if (isTransformableInfo(info)) {
+    if (format) {
+      const formattedInfo = format.transform(info)
+      if (isTransformableInfo(formattedInfo)) {
+        return handleLogform(formattedInfo, level)
       } else {
-        return handleLogform(info, level)
+        return handlePrimitive(formattedInfo)
       }
+    } else {
+      return handleLogform(info, level)
     }
-    case Boolean(info.toString) && typeof info.toString === "function": {
-      return info.toString()
-    }
-    default: {
-      return JSON.stringify(info)
-    }
+  } else if (info instanceof Error && info.stack) {
+    return info.stack
+  } else if (info.toString && typeof info.toString === "function") {
+    return info.toString()
+  } else {
+    return JSON.stringify(info)
   }
 }
 
