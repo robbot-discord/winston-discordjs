@@ -15,7 +15,7 @@ const client = new Discord.Client();
 client.login("DISCORD_API_KEY");
 
 // Find a channel to send log messages to
-const discordChannel = client.channels.find("id", discordChannel)
+const discordChannel = client.channels.get(discordChannelId)
 
 // Create and add the transport to a logger
 const DiscordTransport = require('winston-discordjs');
