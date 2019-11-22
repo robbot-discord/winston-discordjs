@@ -97,9 +97,10 @@ describe("LogHandlers", () => {
 
   describe("handleLogform()", () => {
     it("handles only TransformableInfo", () => {
-      expect(handleLogform(transformableInfo, "info")).toStrictEqual(
-        expectedTransformableInfoResult
-      )
+      expect(handleLogform(transformableInfo, "info")).toStrictEqual([
+        "Level: info, Message: hello world",
+        expectedTransformableInfoResult,
+      ])
     })
 
     it("handles only TransformableInfo with additional data", () => {
@@ -131,7 +132,10 @@ describe("LogHandlers", () => {
           },
           "info"
         )
-      ).toStrictEqual(expectedValue)
+      ).toStrictEqual([
+        "Level: info, Message: hello world, Metadata: [object Object], Stack: some stack",
+        expectedValue,
+      ])
     })
 
     it("handles TransformableInfo with undefined level", () => {
@@ -151,9 +155,10 @@ describe("LogHandlers", () => {
         ],
       })
 
-      expect(handleLogform(transformableInfo, undefined)).toStrictEqual(
-        expectedValue
-      )
+      expect(handleLogform(transformableInfo, undefined)).toStrictEqual([
+        "Level: info, Message: hello world",
+        expectedValue,
+      ])
     })
 
     it("handles TransformableInfo with level mismatch", () => {
@@ -161,36 +166,41 @@ describe("LogHandlers", () => {
     })
 
     it("handles TransformableInfo with level match", () => {
-      expect(handleLogform(transformableInfo, "info")).toStrictEqual(
-        expectedTransformableInfoResult
-      )
+      expect(handleLogform(transformableInfo, "info")).toStrictEqual([
+        "Level: info, Message: hello world",
+        expectedTransformableInfoResult,
+      ])
     })
   })
 
   describe("handleObject()", () => {
     it("handles TransformableInfo", () => {
-      expect(handleObject(transformableInfo, undefined, "info")).toStrictEqual(
-        expectedTransformableInfoResult
-      )
+      expect(handleObject(transformableInfo, undefined, "info")).toStrictEqual([
+        "Level: info, Message: hello world",
+        expectedTransformableInfoResult,
+      ])
     })
 
     it("handles TransformableInfo with format", () => {
-      const expectedValue = new RichEmbed({
-        color: 0,
-        fields: [
-          {
-            name: "Level",
-            value: "info",
-            inline: true,
-          },
-          {
-            name: "Message",
-            value: "hello world",
-            inline: true,
-          },
-          { name: "Timestamp", value: expect.any(String), inline: true },
-        ],
-      })
+      const expectedValue = [
+        expect.stringContaining("hello world"),
+        new RichEmbed({
+          color: 0,
+          fields: [
+            { name: "Timestamp", value: expect.any(String), inline: true },
+            {
+              name: "Level",
+              value: "info",
+              inline: true,
+            },
+            {
+              name: "Message",
+              value: "hello world",
+              inline: true,
+            },
+          ],
+        }),
+      ]
 
       expect(
         handleObject(

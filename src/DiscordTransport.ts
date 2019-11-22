@@ -55,9 +55,9 @@ export class DiscordTransport extends TransportStream {
 
       if (this.discordChannel && logMessage) {
         const messagePromise =
-          logMessage instanceof RichEmbed
-            ? this.discordChannel.send(JSON.stringify(logMessage), {
-                embed: logMessage,
+          logMessage instanceof Array
+            ? this.discordChannel.send(logMessage[0], {
+                embed: logMessage[1],
               })
             : this.discordChannel.send(logMessage)
 

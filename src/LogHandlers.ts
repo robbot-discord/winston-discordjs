@@ -18,27 +18,61 @@ export const handlePrimitive = (info: Primitive): string => {
   }
 }
 
+const sortFields = (fields: string[]): string[] => {
+  const sortedFields = []
+  const timestampIndex = fields.findIndex(value => value === "timestamp")
+  const levelIndex = fields.findIndex(value => value === "level")
+  const messageIndex = fields.findIndex(value => value === "message")
+  if (timestampIndex !== -1) {
+    sortedFields.push(fields[timestampIndex])
+  }
+  if (levelIndex !== -1) {
+    sortedFields.push(fields[levelIndex])
+  }
+  if (messageIndex !== -1) {
+    sortedFields.push(fields[messageIndex])
+  }
+
+  for (const field of fields) {
+    if (field !== "level" && field !== "message" && field !== "timestamp") {
+      sortedFields.push(field)
+    }
+  }
+
+  return sortedFields
+}
+
 export const handleLogform = (
   info: TransformableInfo,
   level?: string
-): RichEmbed | undefined => {
+): [string, RichEmbed] | undefined => {
   if ((level && level === info.level) || !level) {
     const richEmbed = new RichEmbed()
+    let logMessageString = ""
     const color = level
       ? LogLevelToColor[level as LogLevel] ?? "DEFAULT"
       : "DEFAULT"
     richEmbed.setColor(color)
+    const fields = sortFields(Object.keys(info))
 
-    for (const field of Object.keys(info)) {
+    for (const field of fields) {
       const capitalize = (str: string): string =>
         str.charAt(0).toLocaleUpperCase() + str.slice(1)
 
       if (info[field]) {
-        richEmbed.addField(capitalize(field), info[field], true)
+        if (fields.indexOf(field) !== 0) {
+          logMessageString += ", "
+        }
+
+        const capitalizedField = capitalize(field)
+        const value = info[field]
+
+        logMessageString += `${capitalizedField}: ${value}`
+        richEmbed.addField(capitalizedField, value, true)
       }
     }
 
-    return richEmbed
+    return [logMessageString, richEmbed]
   }
 
   return undefined
@@ -48,7 +82,7 @@ export const handleObject = (
   info: Exclude<any, Primitive>,
   format?: Format,
   level?: string
-): string | RichEmbed | undefined => {
+): string | [string, RichEmbed] | undefined => {
   if (isTransformableInfo(info)) {
     if (format) {
       const formattedInfo = format.transform(info)
@@ -73,7 +107,7 @@ export const handleInfo = (
   info: any,
   format?: Format,
   level?: string
-): string | RichEmbed | undefined => {
+): string | [string, RichEmbed] | undefined => {
   if (isPrimitive(info)) {
     return handlePrimitive(info)
   } else if (typeof info === "function") {
