@@ -1,5 +1,4 @@
 {
-    "cSpell.words": [
-        "logv"
-    ]
+  "cSpell.words": ["logv"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
