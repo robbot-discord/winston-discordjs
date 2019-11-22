@@ -2,6 +2,8 @@
 // https://jestjs.io/docs/en/configuration.html
 
 module.exports = {
+  automock: false,
+
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: true,
 
@@ -25,7 +27,7 @@ module.exports = {
   notify: true,
 
   // An enum that specifies notification mode. Requires { notify: true }
-  notifyMode: "failure-change",
+  notifyMode: "change",
 
   // The test environment that will be used for testing
   testEnvironment: "node",
