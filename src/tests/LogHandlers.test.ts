@@ -6,12 +6,28 @@ import {
   handleInfo,
 } from "../LogHandlers"
 import { format, TransformableInfo } from "logform"
+import { RichEmbed } from "discord.js"
 
 describe("LogHandlers", () => {
   const transformableInfo: TransformableInfo = {
     level: "info",
     message: "hello world",
   }
+  const expectedTransformableInfoResult = new RichEmbed({
+    color: 3447003,
+    fields: [
+      {
+        name: "Level",
+        value: "info",
+        inline: true,
+      },
+      {
+        name: "Message",
+        value: "hello world",
+        inline: true,
+      },
+    ],
+  })
 
   describe("isTransformableInfo()", () => {
     it("handles undefined", () => {
@@ -81,25 +97,62 @@ describe("LogHandlers", () => {
 
   describe("handleLogform()", () => {
     it("handles only TransformableInfo", () => {
-      expect(handleLogform(transformableInfo)).toBe(
-        JSON.stringify(transformableInfo)
+      expect(handleLogform(transformableInfo, "info")).toStrictEqual(
+        expectedTransformableInfoResult
       )
     })
 
     it("handles only TransformableInfo with additional data", () => {
+      const expectedValue = new RichEmbed({
+        color: 3447003,
+        fields: [
+          {
+            name: "Level",
+            value: "info",
+            inline: true,
+          },
+          {
+            name: "Message",
+            value: "hello world",
+            inline: true,
+          },
+          { name: "Metadata", value: "[object Object]", inline: true },
+          { name: "Stack", value: "some stack", inline: true },
+        ],
+      })
+
       expect(
         handleLogform(
-          Object.assign(transformableInfo, {
+          {
+            ...transformableInfo,
             metadata: { data: "" },
-            stack: "",
-          })
+            stack: "some stack",
+            empty: "",
+          },
+          "info"
         )
-      ).toBe(JSON.stringify(transformableInfo))
+      ).toStrictEqual(expectedValue)
     })
 
     it("handles TransformableInfo with undefined level", () => {
-      expect(handleLogform(transformableInfo, undefined)).toBe(
-        JSON.stringify(transformableInfo)
+      const expectedValue = new RichEmbed({
+        color: 0,
+        fields: [
+          {
+            name: "Level",
+            value: "info",
+            inline: true,
+          },
+          {
+            name: "Message",
+            value: "hello world",
+            inline: true,
+          },
+        ],
+      })
+
+      expect(handleLogform(transformableInfo, undefined)).toStrictEqual(
+        expectedValue
       )
     })
 
@@ -108,26 +161,44 @@ describe("LogHandlers", () => {
     })
 
     it("handles TransformableInfo with level match", () => {
-      expect(handleLogform(transformableInfo, "info")).toBe(
-        JSON.stringify(transformableInfo)
+      expect(handleLogform(transformableInfo, "info")).toStrictEqual(
+        expectedTransformableInfoResult
       )
     })
   })
 
   describe("handleObject()", () => {
     it("handles TransformableInfo", () => {
-      expect(handleObject(transformableInfo)).toBe(
-        JSON.stringify(transformableInfo)
+      expect(handleObject(transformableInfo, undefined, "info")).toStrictEqual(
+        expectedTransformableInfoResult
       )
     })
 
     it("handles TransformableInfo with format", () => {
+      const expectedValue = new RichEmbed({
+        color: 0,
+        fields: [
+          {
+            name: "Level",
+            value: "info",
+            inline: true,
+          },
+          {
+            name: "Message",
+            value: "hello world",
+            inline: true,
+          },
+          { name: "Timestamp", value: expect.any(String), inline: true },
+        ],
+      })
+
       expect(
         handleObject(
           transformableInfo,
-          format.combine(format.json(), format.simple(), format.timestamp())
+          format.combine(format.json(), format.simple(), format.timestamp()),
+          undefined
         )
-      ).toBe(JSON.stringify(transformableInfo))
+      ).toStrictEqual(expectedValue)
     })
 
     it("handles Errors without stack", () => {

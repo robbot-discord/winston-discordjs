@@ -1,5 +1,5 @@
 import Transport from "winston-transport"
-import { TextChannel, Client } from "discord.js"
+import { TextChannel, Client, RichEmbed } from "discord.js"
 import TransportStream from "winston-transport"
 import { handleInfo } from "./LogHandlers"
 
@@ -54,7 +54,12 @@ export class DiscordTransport extends TransportStream {
       const logMessage = handleInfo(info, this.format, this.level)
 
       if (this.discordChannel && logMessage) {
-        this.discordChannel.sendMessage(logMessage).catch(error => {
+        const messagePromise =
+          logMessage instanceof RichEmbed
+            ? this.discordChannel.send(undefined, { embed: logMessage })
+            : this.discordChannel.send(logMessage)
+
+        messagePromise.catch(error => {
           this.emit("warn", error)
         })
       }

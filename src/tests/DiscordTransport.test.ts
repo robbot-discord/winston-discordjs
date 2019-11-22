@@ -75,20 +75,20 @@ describe("DiscordTransport", () => {
 
     it("handles (string, undefined) correctly", () => {
       const discordChannel = new TextChannel(mockGuild, {})
-      mocked(discordChannel.sendMessage).mockImplementation(() =>
+      mocked(discordChannel.send).mockImplementation(() =>
         Promise.resolve(undefined)
       )
       transport.discordChannel = discordChannel
 
       transport.log("log me!", undefined)
 
-      expect(discordChannel.sendMessage).toBeCalledWith("log me!")
+      expect(discordChannel.send).toBeCalledWith("log me!")
     })
 
-    it("handles sendMessage() throwing an error", done => {
+    it("handles send() throwing an error", done => {
       const discordChannel = new TextChannel(mockGuild, {})
       const fakeError = new Error("fake error")
-      mocked(discordChannel.sendMessage).mockImplementation(() =>
+      mocked(discordChannel.send).mockImplementation(() =>
         Promise.reject(fakeError)
       )
       transport.discordChannel = discordChannel
@@ -98,20 +98,20 @@ describe("DiscordTransport", () => {
       })
       transport.log("log me!", undefined)
 
-      expect(discordChannel.sendMessage).toBeCalledWith("log me!")
+      expect(discordChannel.send).toBeCalledWith("log me!")
     })
 
     it("handles (string, () => {})) correctly", () => {
       const callback = jest.fn()
       const discordChannel = new TextChannel(mockGuild, {})
-      mocked(discordChannel.sendMessage).mockImplementation(() =>
+      mocked(discordChannel.send).mockImplementation(() =>
         Promise.resolve(undefined)
       )
       transport.discordChannel = discordChannel
 
       transport.log("log me!", callback)
 
-      expect(discordChannel.sendMessage).toBeCalledWith("log me!")
+      expect(discordChannel.send).toBeCalledWith("log me!")
       expect(callback).toBeCalledTimes(1)
     })
   })
