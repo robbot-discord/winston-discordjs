@@ -1,5 +1,8 @@
 # Winston Discord.js Transport
 
+[![Actions Status](https://github.com/robbot-discord/winston-discordjs/workflows/Node%20CI/badge.svg)](https://github.com/robbot-discord/winston-discordjs/actions)
+[![Known Vulnerabilities](https://snyk.io/test/github/robbot-discord/winston-discordjs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/robbot-discord/winston-discordjs?targetFile=package.json)
+
 A Winston transport using Discord.js, written in TypeScript
 
 ## Requirements
