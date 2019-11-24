@@ -1,5 +1,6 @@
 # Winston Discord.js Transport
 
+![npm](https://img.shields.io/npm/v/winston-discordjs)
 [![Actions Status](https://github.com/robbot-discord/winston-discordjs/workflows/Node%20CI/badge.svg)](https://github.com/robbot-discord/winston-discordjs/actions)
 [![codecov](https://codecov.io/gh/robbot-discord/winston-discordjs/branch/master/graph/badge.svg)](https://codecov.io/gh/robbot-discord/winston-discordjs)
 [![Known Vulnerabilities](https://snyk.io/test/github/robbot-discord/winston-discordjs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/robbot-discord/winston-discordjs?targetFile=package.json)
