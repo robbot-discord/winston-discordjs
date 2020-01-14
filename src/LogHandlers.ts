@@ -7,17 +7,6 @@ export const isTransformableInfo = (info: any): info is TransformableInfo => {
   return Boolean(info && "level" in info && "message" in info)
 }
 
-export const handlePrimitive = (info: Primitive): string => {
-  switch (typeof info) {
-    case "string": {
-      return info
-    }
-    default: {
-      return String(info)
-    }
-  }
-}
-
 const sortFields = (fields: string[]): string[] => {
   const sortedFields = []
   const timestampIndex = fields.findIndex(value => value === "timestamp")
@@ -42,6 +31,17 @@ const sortFields = (fields: string[]): string[] => {
   return sortedFields
 }
 
+export const handlePrimitive = (info: Primitive): string => {
+  switch (typeof info) {
+    case "string": {
+      return info
+    }
+    default: {
+      return String(info)
+    }
+  }
+}
+
 export const handleLogform = (
   info: TransformableInfo,
   level?: string
@@ -60,7 +60,8 @@ export const handleLogform = (
         str.charAt(0).toLocaleUpperCase() + str.slice(1)
 
       if (info[field]) {
-        if (fields.indexOf(field) !== 0) {
+        const fieldsIndex = fields.indexOf(field)
+        if (fieldsIndex !== 0) {
           logMessageString += ", "
         }
 
@@ -96,9 +97,13 @@ export const handleObject = (
     }
   } else if (info instanceof Error && info.stack) {
     return info.stack
-  } else if (info.toString && typeof info.toString === "function") {
+  } else if (
+    typeof info?.toString === "function" &&
+    info.toString !== Object.toString
+  ) {
     return info.toString()
   } else {
+    // this will call toJSON on the object, if it exists
     return JSON.stringify(info)
   }
 }

@@ -74,7 +74,9 @@ describe("LogHandlers", () => {
         isTransformableInfo({
           level: "info",
           message: "hello world",
-          format: () => {},
+          format: () => {
+            return
+          },
           metadata: {},
         })
       ).toBe(true)
@@ -233,6 +235,30 @@ describe("LogHandlers", () => {
       ).toBe("Hello World!")
     })
 
+    it("handles objects with a toJSON() function", () => {
+      expect(
+        handleObject({
+          toString: undefined,
+          toJSON: function() {
+            return { hello: "world" }
+          },
+        })
+      ).toBe(`{"hello":"world"}`)
+    })
+
+    it("handles objects with a toString() and a toJSON() function", () => {
+      expect(
+        handleObject({
+          toString: function() {
+            return "Hello World!"
+          },
+          toJSON: function() {
+            return JSON.stringify({ hello: "world" })
+          },
+        })
+      ).toBe("Hello World!")
+    })
+
     it("handles objects with a toString property that is a function", () => {
       expect(handleObject({ toString: () => "hello world" })).toBe(
         "hello world"
@@ -256,6 +282,7 @@ describe("LogHandlers", () => {
 
     it("handles object", () => {
       const testObject = { someProperty: "someValue" }
+
       expect(handleInfo(testObject)).toBe(testObject.toString())
     })
   })

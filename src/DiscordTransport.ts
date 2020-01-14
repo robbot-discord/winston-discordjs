@@ -1,5 +1,5 @@
 import Transport from "winston-transport"
-import { TextChannel, Client, RichEmbed } from "discord.js"
+import { TextChannel, Client } from "discord.js"
 import TransportStream from "winston-transport"
 import { handleInfo } from "./LogHandlers"
 
