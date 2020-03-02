@@ -6,14 +6,14 @@ import {
   handleInfo,
 } from "../LogHandlers"
 import { format, TransformableInfo } from "logform"
-import { RichEmbed } from "discord.js"
+import { MessageEmbed } from "discord.js"
 
 describe("LogHandlers", () => {
   const transformableInfo: TransformableInfo = {
     level: "info",
     message: "hello world",
   }
-  const expectedTransformableInfoResult = new RichEmbed({
+  const expectedTransformableInfoResult = new MessageEmbed({
     color: 3447003,
     fields: [
       {
@@ -106,7 +106,7 @@ describe("LogHandlers", () => {
     })
 
     it("handles only TransformableInfo with additional data", () => {
-      const expectedValue = new RichEmbed({
+      const expectedValue = new MessageEmbed({
         color: 3447003,
         fields: [
           {
@@ -141,7 +141,7 @@ describe("LogHandlers", () => {
     })
 
     it("handles TransformableInfo with undefined level", () => {
-      const expectedValue = new RichEmbed({
+      const expectedValue = new MessageEmbed({
         color: 0,
         fields: [
           {
@@ -184,33 +184,42 @@ describe("LogHandlers", () => {
     })
 
     it("handles TransformableInfo with format", () => {
+      const expectedMessageEmbed = new MessageEmbed({
+        color: 0,
+        fields: [
+          // { name: "Timestamp", value: expect.anything(), inline: true },
+          {
+            name: "Level",
+            value: "info",
+            inline: true,
+          },
+          {
+            name: "Message",
+            value: "hello world",
+            inline: true,
+          },
+        ],
+        files: [],
+        provider: null,
+        video: null,
+      })
+
       const expectedValue = [
         expect.stringContaining("hello world"),
-        new RichEmbed({
-          color: 0,
-          fields: [
-            { name: "Timestamp", value: expect.any(String), inline: true },
-            {
-              name: "Level",
-              value: "info",
-              inline: true,
-            },
-            {
-              name: "Message",
-              value: "hello world",
-              inline: true,
-            },
-          ],
-        }),
+        expectedMessageEmbed,
       ]
 
       expect(
         handleObject(
           transformableInfo,
-          format.combine(format.json(), format.simple(), format.timestamp()),
+          format.combine(
+            format.json(),
+            format.simple()
+            // format.timestamp()
+          ),
           undefined
         )
-      ).toStrictEqual(expectedValue)
+      ).toEqual(expectedValue)
     })
 
     it("handles Errors without stack", () => {

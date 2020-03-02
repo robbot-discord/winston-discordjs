@@ -1,6 +1,6 @@
 import { TransformableInfo, Format } from "logform"
 import { isPrimitive, Primitive } from "utility-types"
-import { RichEmbed } from "discord.js"
+import { MessageEmbed } from "discord.js"
 import { LogLevel, LogLevelToColor } from "./LogLevels"
 
 export const isTransformableInfo = (info: any): info is TransformableInfo => {
@@ -45,14 +45,14 @@ export const handlePrimitive = (info: Primitive): string => {
 export const handleLogform = (
   info: TransformableInfo,
   level?: string
-): [string, RichEmbed] | undefined => {
+): [string, MessageEmbed] | undefined => {
   if ((level && level === info.level) || !level) {
-    const richEmbed = new RichEmbed()
+    const messageEmbed = new MessageEmbed()
     let logMessageString = ""
     const color = level
       ? LogLevelToColor[level as LogLevel] ?? "DEFAULT"
       : "DEFAULT"
-    richEmbed.setColor(color)
+    messageEmbed.setColor(color)
     const fields = sortFields(Object.keys(info))
 
     for (const field of fields) {
@@ -69,11 +69,11 @@ export const handleLogform = (
         const value = info[field]
 
         logMessageString += `${capitalizedField}: ${value}`
-        richEmbed.addField(capitalizedField, value, true)
+        messageEmbed.addField(capitalizedField, value, true)
       }
     }
 
-    return [logMessageString, richEmbed]
+    return [logMessageString, messageEmbed]
   }
 
   return undefined
@@ -83,7 +83,7 @@ export const handleObject = (
   info: Exclude<any, Primitive>,
   format?: Format,
   level?: string
-): string | [string, RichEmbed] | undefined => {
+): string | [string, MessageEmbed] | undefined => {
   if (isTransformableInfo(info)) {
     if (format) {
       const formattedInfo = format.transform(info)
@@ -112,7 +112,7 @@ export const handleInfo = (
   info: any,
   format?: Format,
   level?: string
-): string | [string, RichEmbed] | undefined => {
+): string | [string, MessageEmbed] | undefined => {
   if (isPrimitive(info)) {
     return handlePrimitive(info)
   } else if (typeof info === "function") {

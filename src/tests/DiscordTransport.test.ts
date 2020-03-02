@@ -2,7 +2,7 @@ import DiscordTransport, {
   DiscordTransportStreamOptions,
 } from "../DiscordTransport"
 import { mocked } from "ts-jest/utils"
-import Discord, { TextChannel, Channel } from "discord.js"
+import Discord, { TextChannel, Channel, ChannelManager } from "discord.js"
 
 jest.mock("discord.js")
 
@@ -30,11 +30,13 @@ describe("DiscordTransport", () => {
         discordToken: "EXAMPLE_API_TOKEN",
         discordChannel: "12345",
       }
-      const { Collection, TextChannel } = jest.requireActual("discord.js")
-      const expectedChannel = new TextChannel(jest.fn())
-      const channelsMap = new Map<string, Channel>()
-      channelsMap.set("12345", expectedChannel)
-      const channels = new Collection(channelsMap)
+      // const { Collection, TextChannel } = jest.requireActual("discord.js")
+      const expectedChannel = new TextChannel(undefined, undefined)
+
+      // const channelsMap = new Map<string, Channel>()
+      // channelsMap.set("12345", expectedChannel)
+      const channels = new ChannelManager(undefined, undefined)
+      const mockedChannels = mocked(channels, true)
 
       const mockDiscord = mocked(Discord, true)
       mockDiscord.Client.mockImplementation(() => {
@@ -44,12 +46,14 @@ describe("DiscordTransport", () => {
         mockClient.on = jest.fn()
         return mockClient
       })
-      mockDiscord.TextChannel = TextChannel
+      // mockDiscord.TextChannel = TextChannel
 
+      // asserts need to be in the callback, due to the async nature
+      mockedChannels.fetch.mockResolvedValue(expectedChannel)
       const transport = new DiscordTransport(options)
 
       expect(transport).toBeDefined()
-      expect(transport.discordChannel).toBeDefined()
+      expect(transport.discordChannel).toBeUndefined()
       expect(transport.discordClient).toBeDefined()
 
       const discordClient = mocked(transport.discordClient, true)
