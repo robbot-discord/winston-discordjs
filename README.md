@@ -9,7 +9,7 @@ A Winston transport using Discord.js, written in TypeScript
 
 ## Requirements
 
-- Node.js 10+
+- Node.js 12+
 
 ## Usage
 
@@ -38,7 +38,7 @@ export interface DiscordTransportStreamOptions
   extends Transport.TransportStreamOptions {
   discordClient?: Client
   discordToken?: string
-  discordChannel?: string | TextChannel
+  discordChannel?: TextChannel
 }
 ```
 
