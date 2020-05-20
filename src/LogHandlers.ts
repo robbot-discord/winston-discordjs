@@ -9,9 +9,9 @@ export const isTransformableInfo = (info: any): info is TransformableInfo => {
 
 const sortFields = (fields: string[]): string[] => {
   const sortedFields = []
-  const timestampIndex = fields.findIndex(value => value === "timestamp")
-  const levelIndex = fields.findIndex(value => value === "level")
-  const messageIndex = fields.findIndex(value => value === "message")
+  const timestampIndex = fields.findIndex((value) => value === "timestamp")
+  const levelIndex = fields.findIndex((value) => value === "level")
+  const messageIndex = fields.findIndex((value) => value === "message")
   if (timestampIndex !== -1) {
     sortedFields.push(fields[timestampIndex])
   }

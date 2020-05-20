@@ -237,7 +237,7 @@ describe("LogHandlers", () => {
     it("handles objects with a toString() function", () => {
       expect(
         handleObject({
-          toString: function() {
+          toString: function () {
             return "Hello World!"
           },
         })
@@ -248,7 +248,7 @@ describe("LogHandlers", () => {
       expect(
         handleObject({
           toString: undefined,
-          toJSON: function() {
+          toJSON: function () {
             return { hello: "world" }
           },
         })
@@ -258,10 +258,10 @@ describe("LogHandlers", () => {
     it("handles objects with a toString() and a toJSON() function", () => {
       expect(
         handleObject({
-          toString: function() {
+          toString: function () {
             return "Hello World!"
           },
-          toJSON: function() {
+          toJSON: function () {
             return JSON.stringify({ hello: "world" })
           },
         })

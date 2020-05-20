@@ -31,7 +31,7 @@ export class DiscordTransport extends TransportStream {
       } else {
         if (discordToken) {
           this.discordClient = new Client()
-          this.discordClient.on("error", error => {
+          this.discordClient.on("error", (error) => {
             this.emit("warn", error)
           })
           this.discordClient.login(discordToken)
@@ -61,7 +61,7 @@ export class DiscordTransport extends TransportStream {
 
         this.discordClient.channels
           .fetch(this.discordChannelId)
-          .then(channel => {
+          .then((channel) => {
             if (channel instanceof TextChannel) {
               this.discordChannel = channel
             } else {
@@ -71,7 +71,7 @@ export class DiscordTransport extends TransportStream {
               )
             }
           })
-          .catch(error => {
+          .catch((error) => {
             this.emit(
               "warn",
               `DiscordTransport.log failed to initialize DiscordChannel with <${this.discordChannelId}>: ${error}`
@@ -87,7 +87,7 @@ export class DiscordTransport extends TransportStream {
               })
             : this.discordChannel.send(logMessage)
 
-        messagePromise.catch(error => {
+        messagePromise.catch((error) => {
           this.emit("warn", error)
         })
       }

@@ -89,14 +89,14 @@ describe("DiscordTransport", () => {
       expect(discordChannel.send).toBeCalledWith("log me!")
     })
 
-    it("handles send() throwing an error", done => {
+    it("handles send() throwing an error", (done) => {
       const discordChannel = new TextChannel(mockGuild, {})
       const fakeError = new Error("fake error")
       mocked(discordChannel.send).mockImplementation(() =>
         Promise.reject(fakeError)
       )
       transport.discordChannel = discordChannel
-      transport.on("warn", error => {
+      transport.on("warn", (error) => {
         expect(error).toBe(fakeError)
         done()
       })
