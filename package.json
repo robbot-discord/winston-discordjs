@@ -3,7 +3,7 @@
   "bugs": "https://github.com/robbot-discord/winston-discordjs/issues",
   "dependencies": {
     "@types/ws": "^7.4.0",
-    "discord.js": "^12.4.1",
+    "discord.js": "^12.5.0",
     "logform": "^2.2.0",
     "utility-types": "^3.10.0",
     "winston": "^3.3.3",
