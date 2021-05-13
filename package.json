@@ -11,7 +11,7 @@
   },
   "description": "Winston Transport using Discord.js",
   "devDependencies": {
-    "@babel/core": "^7.14.0",
+    "@babel/core": "^7.14.2",
     "@babel/preset-env": "^7.14.1",
     "@babel/preset-typescript": "^7.13.0",
     "@types/jest": "^26.0.23",
