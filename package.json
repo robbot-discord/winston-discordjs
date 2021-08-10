@@ -61,7 +61,7 @@
     ]
   },
   "main": "dist/index.js",
-  "name": "winston-discordjs-13",
+  "name": "winston-discordjs",
   "private": false,
   "repository": "https://github.com/TKDBB84/winston-discordjs",
   "scripts": {
