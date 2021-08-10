@@ -1,15 +1,14 @@
-import DiscordTransport, {
-  DiscordTransportStreamOptions,
-} from "../DiscordTransport"
+import * as DiscordTransport from "../DiscordTransport"
 import { mocked } from "ts-jest/utils"
-import Discord, { TextChannel, Channel, ChannelManager } from "discord.js"
+import * as Discord from "discord.js"
+import { ChannelType } from "discord-api-types/payloads/v9/channel"
 
 jest.mock("discord.js")
 
 describe("DiscordTransport", () => {
   describe("constructor", () => {
     it("handles undefined successfully", () => {
-      const transport = new DiscordTransport(undefined)
+      const transport = new DiscordTransport.DiscordTransport(undefined)
 
       expect(transport).toBeDefined()
       expect(transport.discordChannel).toBeUndefined()
@@ -17,8 +16,8 @@ describe("DiscordTransport", () => {
     })
 
     it("handles empty options successfully", () => {
-      const options: DiscordTransportStreamOptions = {}
-      const transport = new DiscordTransport(options)
+      const options: DiscordTransport.DiscordTransportStreamOptions = {}
+      const transport = new DiscordTransport.DiscordTransport(options)
 
       expect(transport).toBeDefined()
       expect(transport.discordChannel).toBeUndefined()
@@ -26,21 +25,21 @@ describe("DiscordTransport", () => {
     })
 
     it("handles Discord API Token successfully", () => {
-      const options: DiscordTransportStreamOptions = {
+      const options: DiscordTransport.DiscordTransportStreamOptions = {
         discordToken: "EXAMPLE_API_TOKEN",
         discordChannel: "12345",
       }
       // const { Collection, TextChannel } = jest.requireActual("discord.js")
-      const expectedChannel = new TextChannel(undefined, undefined)
+      const expectedChannel = new Discord.TextChannel(undefined, undefined)
 
       // const channelsMap = new Map<string, Channel>()
       // channelsMap.set("12345", expectedChannel)
-      const channels = new ChannelManager(undefined, undefined)
+      const channels = new Discord.ChannelManager(undefined, undefined)
       const mockedChannels = mocked(channels, true)
 
       const mockDiscord = mocked(Discord, true)
       mockDiscord.Client.mockImplementation(() => {
-        const mockClient = (jest.fn() as unknown) as Discord.Client
+        const mockClient = jest.fn() as unknown as Discord.Client
         mockClient.channels = channels
         mockClient.login = jest.fn()
         mockClient.on = jest.fn()
@@ -50,7 +49,7 @@ describe("DiscordTransport", () => {
 
       // asserts need to be in the callback, due to the async nature
       mockedChannels.fetch.mockResolvedValue(expectedChannel)
-      const transport = new DiscordTransport(options)
+      const transport = new DiscordTransport.DiscordTransport(options)
 
       expect(transport).toBeDefined()
       expect(transport.discordChannel).toBeUndefined()
@@ -64,12 +63,18 @@ describe("DiscordTransport", () => {
   })
 
   describe("log()", () => {
-    const mockClient = new Discord.Client()
-    const mockGuild = new Discord.Guild(mockClient, {})
-    const transport = new DiscordTransport()
+    const mockClient = new Discord.Client({ intents: [] })
+    const mockGuild = new Discord.Guild(mockClient, {
+      unavailable: true,
+      id: "some-mock-id",
+    })
+    const transport = new DiscordTransport.DiscordTransport()
 
     it("handles (undefined, undefined) correctly", () => {
-      const discordChannel = new TextChannel(mockGuild, {})
+      const discordChannel = new Discord.TextChannel(mockGuild, {
+        id: "mock-channel-id",
+        type: ChannelType.GuildText,
+      })
       transport.discordChannel = discordChannel
 
       transport.log(undefined, undefined)
@@ -78,7 +83,10 @@ describe("DiscordTransport", () => {
     })
 
     it("handles (string, undefined) correctly", () => {
-      const discordChannel = new TextChannel(mockGuild, {})
+      const discordChannel = new Discord.TextChannel(mockGuild, {
+        id: "mock-channel-id",
+        type: ChannelType.GuildText,
+      })
       mocked(discordChannel.send).mockImplementation(() =>
         Promise.resolve(undefined)
       )
@@ -90,12 +98,17 @@ describe("DiscordTransport", () => {
     })
 
     it("handles send() throwing an error", (done) => {
-      const discordChannel = new TextChannel(mockGuild, {})
+      const discordChannel = new Discord.TextChannel(mockGuild, {
+        id: "mock-channel-id",
+        type: ChannelType.GuildText,
+      })
       const fakeError = new Error("fake error")
       mocked(discordChannel.send).mockImplementation(() =>
         Promise.reject(fakeError)
       )
       transport.discordChannel = discordChannel
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       transport.on("warn", (error) => {
         expect(error).toBe(fakeError)
         done()
@@ -107,7 +120,10 @@ describe("DiscordTransport", () => {
 
     it("handles (string, () => {})) correctly", () => {
       const callback = jest.fn()
-      const discordChannel = new TextChannel(mockGuild, {})
+      const discordChannel = new Discord.TextChannel(mockGuild, {
+        id: "mock-channel-id",
+        type: ChannelType.GuildText,
+      })
       mocked(discordChannel.send).mockImplementation(() =>
         Promise.resolve(undefined)
       )
@@ -121,9 +137,9 @@ describe("DiscordTransport", () => {
   })
 
   describe("close()", () => {
-    const transport = new DiscordTransport()
+    const transport = new DiscordTransport.DiscordTransport()
     it("destroys discordClient if defined", () => {
-      const mockClient = new Discord.Client()
+      const mockClient = new Discord.Client({ intents: [] })
       mockClient.destroy = jest.fn()
 
       transport.discordClient = mockClient
