@@ -5,11 +5,11 @@ import {
   handleObject,
   handleInfo,
 } from "../LogHandlers"
-import { format, TransformableInfo } from "logform"
+import * as logform from "logform"
 import { MessageEmbed } from "discord.js"
 
 describe("LogHandlers", () => {
-  const transformableInfo: TransformableInfo = {
+  const transformableInfo: logform.TransformableInfo = {
     level: "info",
     message: "hello world",
   }
@@ -199,7 +199,6 @@ describe("LogHandlers", () => {
             inline: true,
           },
         ],
-        files: [],
         provider: null,
         video: null,
       })
@@ -212,9 +211,9 @@ describe("LogHandlers", () => {
       expect(
         handleObject(
           transformableInfo,
-          format.combine(
-            format.json(),
-            format.simple()
+          logform.format.combine(
+            logform.format.json(),
+            logform.format.simple()
             // format.timestamp()
           ),
           undefined

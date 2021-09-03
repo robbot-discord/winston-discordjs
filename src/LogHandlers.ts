@@ -69,7 +69,7 @@ export const handleLogform = (
         const value = info[field]
 
         logMessageString += `${capitalizedField}: ${value}`
-        messageEmbed.addField(capitalizedField, value, true)
+        messageEmbed.addField(capitalizedField, value.toString(), true)
       }
     }
 

@@ -1,5 +1,12 @@
-import Transport from "winston-transport"
-import { TextChannel, Client } from "discord.js"
+import * as Transport from "winston-transport"
+import {
+  TextChannel,
+  Client,
+  BitFieldResolvable,
+  IntentsString,
+  MessageEmbed,
+  Message,
+} from "discord.js"
 import TransportStream from "winston-transport"
 import { handleInfo } from "./LogHandlers"
 
@@ -8,6 +15,7 @@ export interface DiscordTransportStreamOptions
   discordClient?: Client
   discordToken?: string
   discordChannel?: string | TextChannel
+  intents?: BitFieldResolvable<IntentsString, number>
 }
 
 const deprecationMessage = `Passing in a 'string' for { discordToken } is now deprecated, due to changes in Discord.js API. Please use a different initialization method.`
@@ -25,12 +33,12 @@ export class DiscordTransport extends TransportStream {
     super(opts)
 
     if (opts) {
-      const { discordChannel, discordToken } = opts
+      const { discordChannel, discordToken, intents = [] } = opts
       if (opts.discordClient) {
         this.discordClient = opts.discordClient
       } else {
         if (discordToken) {
-          this.discordClient = new Client()
+          this.discordClient = new Client({ intents })
           this.discordClient.on("error", (error) => {
             this.emit("warn", error)
           })
@@ -80,16 +88,22 @@ export class DiscordTransport extends TransportStream {
       }
 
       if (this.discordChannel && logMessage) {
-        const messagePromise =
-          logMessage instanceof Array
-            ? this.discordChannel.send(logMessage[0], {
-                embed: logMessage[1],
-              })
-            : this.discordChannel.send(logMessage)
-
-        messagePromise.catch((error) => {
-          this.emit("warn", error)
-        })
+        if (logMessage) {
+          let messagePromise: Promise<Message>
+          if (Array.isArray(logMessage)) {
+            const content = logMessage[0]
+            const embed = logMessage[1]
+            messagePromise = this.discordChannel.send({
+              content,
+              embeds: [embed],
+            })
+          } else {
+            messagePromise = this.discordChannel.send(logMessage)
+          }
+          messagePromise.catch((error) => {
+            this.emit("warn", error)
+          })
+        }
       }
     }
 
