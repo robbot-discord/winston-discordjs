@@ -3,8 +3,10 @@ import { isPrimitive, Primitive } from "utility-types"
 import { MessageEmbed } from "discord.js"
 import { LogLevel, LogLevelToColor } from "./LogLevels"
 
-export const isTransformableInfo = (info: any): info is TransformableInfo => {
-  return Boolean(info && "level" in info && "message" in info)
+export const isTransformableInfo = (
+  info: unknown
+): info is TransformableInfo => {
+  return Boolean(info && "level" in (info as any) && "message" in (info as any))
 }
 
 const sortFields = (fields: string[]): string[] => {
@@ -109,7 +111,7 @@ export const handleObject = (
 }
 
 export const handleInfo = (
-  info: any,
+  info: unknown,
   format?: Format,
   level?: string
 ): string | [string, MessageEmbed] | undefined => {

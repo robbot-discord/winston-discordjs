@@ -107,8 +107,6 @@ describe("DiscordTransport", () => {
         Promise.reject(fakeError)
       )
       transport.discordChannel = discordChannel
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       transport.on("warn", (error) => {
         expect(error).toBe(fakeError)
         done()

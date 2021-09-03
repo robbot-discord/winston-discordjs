@@ -4,7 +4,6 @@ import {
   Client,
   BitFieldResolvable,
   IntentsString,
-  MessageEmbed,
   Message,
 } from "discord.js"
 import TransportStream from "winston-transport"
@@ -56,7 +55,7 @@ export class DiscordTransport extends TransportStream {
     }
   }
 
-  log(info: any, callback?: () => void): void {
+  log(info: unknown, callback?: () => void): void {
     setImmediate(() => {
       this.emit("logged", info)
     })
