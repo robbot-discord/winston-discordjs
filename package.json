@@ -7,7 +7,7 @@
     "logform": "^2.3.0",
     "utility-types": "^3.10.0",
     "winston": "^3.3.3",
-    "winston-transport": "^4.4.1"
+    "winston-transport": "^4.4.2"
   },
   "description": "Winston Transport using Discord.js",
   "devDependencies": {
