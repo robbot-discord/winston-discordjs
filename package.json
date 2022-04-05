@@ -6,7 +6,7 @@
     "discord.js": "^13.6.0",
     "logform": "^2.4.0",
     "utility-types": "^3.10.0",
-    "winston": "^3.6.0",
+    "winston": "^3.7.2",
     "winston-transport": "^4.5.0"
   },
   "description": "Winston Transport using Discord.js",
