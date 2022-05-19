@@ -1,7 +1,6 @@
 import * as DiscordTransport from "../DiscordTransport"
-import { mocked } from "ts-jest/utils"
+import { mocked } from "jest-mock"
 import * as Discord from "discord.js"
-import { ChannelType } from "discord-api-types/payloads/v9/channel"
 
 jest.mock("discord.js")
 
@@ -73,7 +72,7 @@ describe("DiscordTransport", () => {
     it("handles (undefined, undefined) correctly", () => {
       const discordChannel = new Discord.TextChannel(mockGuild, {
         id: "mock-channel-id",
-        type: ChannelType.GuildText,
+        type: Discord.BaseGuildTextChannel,
       })
       transport.discordChannel = discordChannel
 
@@ -85,7 +84,7 @@ describe("DiscordTransport", () => {
     it("handles (string, undefined) correctly", () => {
       const discordChannel = new Discord.TextChannel(mockGuild, {
         id: "mock-channel-id",
-        type: ChannelType.GuildText,
+        type: Discord.BaseGuildTextChannel,
       })
       mocked(discordChannel.send).mockImplementation(() =>
         Promise.resolve(undefined)
@@ -100,7 +99,7 @@ describe("DiscordTransport", () => {
     it("handles send() throwing an error", (done) => {
       const discordChannel = new Discord.TextChannel(mockGuild, {
         id: "mock-channel-id",
-        type: ChannelType.GuildText,
+        type: Discord.BaseGuildTextChannel,
       })
       const fakeError = new Error("fake error")
       mocked(discordChannel.send).mockImplementation(() =>
@@ -120,7 +119,7 @@ describe("DiscordTransport", () => {
       const callback = jest.fn()
       const discordChannel = new Discord.TextChannel(mockGuild, {
         id: "mock-channel-id",
-        type: ChannelType.GuildText,
+        type: Discord.BaseGuildTextChannel,
       })
       mocked(discordChannel.send).mockImplementation(() =>
         Promise.resolve(undefined)
