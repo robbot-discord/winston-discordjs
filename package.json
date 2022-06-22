@@ -4,7 +4,7 @@
   "dependencies": {
     "@types/ws": "^8.5.3",
     "discord.js": "^13.8.0",
-    "logform": "^2.4.0",
+    "logform": "^2.4.1",
     "utility-types": "^3.10.0",
     "winston": "^3.7.2",
     "winston-transport": "^4.5.0"
