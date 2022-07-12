@@ -8,8 +8,7 @@
     "winston-transport": "^4.5.0"
   },
   "peerDependencies": {
-    "discord.js": "^13.8.1",
-    "winston": "^3.8.1"
+    "discord.js": "^13.8.1"
   },
   "description": "Winston Transport using Discord.js",
   "devDependencies": {
