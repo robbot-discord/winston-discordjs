@@ -199,8 +199,6 @@ describe("LogHandlers", () => {
             inline: true,
           },
         ],
-        provider: null,
-        video: null,
       })
 
       const expectedValue = [

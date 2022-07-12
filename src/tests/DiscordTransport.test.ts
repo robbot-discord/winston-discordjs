@@ -1,5 +1,6 @@
-import * as DiscordTransport from "../DiscordTransport"
-import { mocked } from "jest-mock"
+import DiscordTransport, {
+  DiscordTransportStreamOptions,
+} from "../DiscordTransport"
 import * as Discord from "discord.js"
 
 jest.mock("discord.js")
@@ -7,7 +8,7 @@ jest.mock("discord.js")
 describe("DiscordTransport", () => {
   describe("constructor", () => {
     it("handles undefined successfully", () => {
-      const transport = new DiscordTransport.DiscordTransport(undefined)
+      const transport = new DiscordTransport(undefined)
 
       expect(transport).toBeDefined()
       expect(transport.discordChannel).toBeUndefined()
@@ -15,8 +16,8 @@ describe("DiscordTransport", () => {
     })
 
     it("handles empty options successfully", () => {
-      const options: DiscordTransport.DiscordTransportStreamOptions = {}
-      const transport = new DiscordTransport.DiscordTransport(options)
+      const options: DiscordTransportStreamOptions = {}
+      const transport = new DiscordTransport(options)
 
       expect(transport).toBeDefined()
       expect(transport.discordChannel).toBeUndefined()
@@ -24,131 +25,146 @@ describe("DiscordTransport", () => {
     })
 
     it("handles Discord API Token successfully", () => {
-      const options: DiscordTransport.DiscordTransportStreamOptions = {
+      const options: DiscordTransportStreamOptions = {
         discordToken: "EXAMPLE_API_TOKEN",
         discordChannel: "12345",
       }
-      // const { Collection, TextChannel } = jest.requireActual("discord.js")
-      const expectedChannel = new Discord.TextChannel(undefined, undefined)
 
-      // const channelsMap = new Map<string, Channel>()
-      // channelsMap.set("12345", expectedChannel)
-      const channels = new Discord.ChannelManager(undefined, undefined)
-      const mockedChannels = mocked(channels, true)
+      const fakeChannelManager = {} as Partial<Discord.ChannelManager>
 
-      const mockDiscord = mocked(Discord, true)
-      mockDiscord.Client.mockImplementation(() => {
-        const mockClient = jest.fn() as unknown as Discord.Client
-        mockClient.channels = channels
-        mockClient.login = jest.fn()
-        mockClient.on = jest.fn()
-        return mockClient
-      })
-      // mockDiscord.TextChannel = TextChannel
+      const fakeDiscordClient = {
+        login: jest.fn(),
+        on: jest.fn(),
+      } as Partial<Discord.Client>
+      fakeDiscordClient.channels = fakeChannelManager as Discord.ChannelManager
 
-      // asserts need to be in the callback, due to the async nature
-      mockedChannels.fetch.mockResolvedValue(expectedChannel)
-      const transport = new DiscordTransport.DiscordTransport(options)
+      const transport = new DiscordTransport(options)
 
       expect(transport).toBeDefined()
       expect(transport.discordChannel).toBeUndefined()
       expect(transport.discordClient).toBeDefined()
 
-      const discordClient = mocked(transport.discordClient, true)
+      const discordClient = transport.discordClient as typeof fakeDiscordClient
 
-      expect(discordClient.login).toBeCalledTimes(1)
-      expect(discordClient.on).toBeCalledTimes(1)
+      const mockedLogin = discordClient.login as jest.MockedFunction<
+        typeof Discord.Client["prototype"]["login"]
+      >
+      const mockedOn = discordClient.on as jest.MockedFunction<
+        typeof Discord.Client["prototype"]["on"]
+      >
+
+      expect(mockedLogin).toBeCalledTimes(1)
+      expect(mockedLogin).toHaveBeenCalledWith(options.discordToken)
+      expect(mockedOn).toBeCalledTimes(1)
+      expect(mockedOn).toHaveBeenCalledWith("error", expect.any(Function))
     })
   })
 
   describe("log()", () => {
-    const mockClient = new Discord.Client({ intents: [] })
-    const mockGuild = new Discord.Guild(mockClient, {
-      unavailable: true,
-      id: "some-mock-id",
+    let transport: DiscordTransport
+    beforeEach(() => {
+      transport = new DiscordTransport()
     })
-    const transport = new DiscordTransport.DiscordTransport()
 
     it("handles (undefined, undefined) correctly", () => {
-      const discordChannel = new Discord.TextChannel(mockGuild, {
-        id: "mock-channel-id",
-        type: Discord.BaseGuildTextChannel,
-      })
-      transport.discordChannel = discordChannel
+      const fakeDiscordChannel = {
+        send: jest.fn(async () => {
+          return {}
+        }) as unknown,
+      } as Partial<Discord.TextChannel>
+      transport.discordChannel = fakeDiscordChannel as Discord.TextChannel
 
       transport.log(undefined, undefined)
 
-      expect(discordChannel.send).not.toBeCalled()
+      const mockSend = fakeDiscordChannel.send as jest.MockedFunction<
+        Discord.TextChannel["send"]
+      >
+
+      expect(mockSend).not.toBeCalled()
     })
 
     it("handles (string, undefined) correctly", () => {
-      const discordChannel = new Discord.TextChannel(mockGuild, {
-        id: "mock-channel-id",
-        type: Discord.BaseGuildTextChannel,
-      })
-      mocked(discordChannel.send).mockImplementation(() =>
-        Promise.resolve(undefined)
-      )
-      transport.discordChannel = discordChannel
+      const fakeDiscordChannel = {
+        send: jest.fn(async () => {
+          return {}
+        }) as unknown,
+      } as Partial<Discord.TextChannel>
+      transport.discordChannel = fakeDiscordChannel as Discord.TextChannel
 
       transport.log("log me!", undefined)
 
-      expect(discordChannel.send).toBeCalledWith("log me!")
+      const mockSend = fakeDiscordChannel.send as jest.MockedFunction<
+        Discord.TextChannel["send"]
+      >
+
+      expect(mockSend).toBeCalledWith("log me!")
     })
 
     it("handles send() throwing an error", (done) => {
-      const discordChannel = new Discord.TextChannel(mockGuild, {
-        id: "mock-channel-id",
-        type: Discord.BaseGuildTextChannel,
-      })
       const fakeError = new Error("fake error")
-      mocked(discordChannel.send).mockImplementation(() =>
-        Promise.reject(fakeError)
-      )
-      transport.discordChannel = discordChannel
+
+      const fakeDiscordChannel = {
+        send: jest.fn(async () => {
+          throw fakeError
+        }) as unknown,
+      } as Partial<Discord.TextChannel>
+      transport.discordChannel = fakeDiscordChannel as Discord.TextChannel
+
+      const mockSend = fakeDiscordChannel.send as jest.MockedFunction<
+        Discord.TextChannel["send"]
+      >
+
+      transport.discordChannel = fakeDiscordChannel as Discord.TextChannel
       transport.on("warn", (error) => {
-        expect(error).toBe(fakeError)
+        expect(error).toStrictEqual(fakeError)
+        expect(mockSend).toBeCalledWith("log me!")
         done()
       })
       transport.log("log me!", undefined)
-
-      expect(discordChannel.send).toBeCalledWith("log me!")
     })
 
     it("handles (string, () => {})) correctly", () => {
       const callback = jest.fn()
-      const discordChannel = new Discord.TextChannel(mockGuild, {
-        id: "mock-channel-id",
-        type: Discord.BaseGuildTextChannel,
-      })
-      mocked(discordChannel.send).mockImplementation(() =>
-        Promise.resolve(undefined)
-      )
-      transport.discordChannel = discordChannel
 
+      const fakeDiscordChannel = {
+        send: jest.fn(async () => {
+          return {}
+        }) as unknown,
+      } as Partial<Discord.TextChannel>
+      transport.discordChannel = fakeDiscordChannel as Discord.TextChannel
+
+      transport.log("log me!", undefined)
+
+      const mockSend = fakeDiscordChannel.send as jest.MockedFunction<
+        Discord.TextChannel["send"]
+      >
+
+      transport.discordChannel = fakeDiscordChannel as Discord.TextChannel
       transport.log("log me!", callback)
 
-      expect(discordChannel.send).toBeCalledWith("log me!")
+      expect(mockSend).toBeCalledWith("log me!")
       expect(callback).toBeCalledTimes(1)
     })
-  })
 
-  describe("close()", () => {
-    const transport = new DiscordTransport.DiscordTransport()
-    it("destroys discordClient if defined", () => {
-      const mockClient = new Discord.Client({ intents: [] })
-      mockClient.destroy = jest.fn()
+    describe("close()", () => {
+      let transport: DiscordTransport
+      beforeEach(() => {
+        transport = new DiscordTransport()
+      })
+      it("destroys discordClient if defined", () => {
+        const mockClient = new Discord.Client({ intents: [] })
+        mockClient.destroy = jest.fn()
 
-      transport.discordClient = mockClient
-      transport.close()
+        transport.discordClient = mockClient
+        transport.close()
 
-      expect(mockClient.destroy).toBeCalledTimes(1)
-    })
+        expect(mockClient.destroy).toBeCalledTimes(1)
+      })
 
-    it("handles undefined discordClient", () => {
-      transport.discordClient = undefined
-      transport.close()
-      // no expect needed, lack of Errors mean success
+      it("handles undefined discordClient", () => {
+        transport.discordClient = undefined
+        expect(() => transport.close()).not.toThrow()
+      })
     })
   })
 })

@@ -53,22 +53,20 @@ export class DiscordTransport extends TransportStream {
       const logMessage = handleInfo(info, this.format, this.level)
 
       if (this.discordChannel && logMessage) {
-        if (logMessage) {
-          let messagePromise: Promise<Message>
-          if (Array.isArray(logMessage)) {
-            const content = logMessage[0]
-            const embed = logMessage[1]
-            messagePromise = this.discordChannel.send({
-              content,
-              embeds: [embed],
-            })
-          } else {
-            messagePromise = this.discordChannel.send(logMessage)
-          }
-          messagePromise.catch((error) => {
-            this.emit("warn", error)
+        let messagePromise: Promise<Message>
+        if (Array.isArray(logMessage)) {
+          const content = logMessage[0]
+          const embed = logMessage[1]
+          messagePromise = this.discordChannel.send({
+            content,
+            embeds: [embed],
           })
+        } else {
+          messagePromise = this.discordChannel.send(logMessage)
         }
+        messagePromise.catch((error) => {
+          this.emit("warn", error)
+        })
       }
     }
 
