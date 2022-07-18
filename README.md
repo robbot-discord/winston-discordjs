@@ -9,7 +9,7 @@ A Winston transport using Discord.js, written in TypeScript
 
 ## Requirements
 
-- Node.js 16.6+
+- Node.js 16.9+
 
 ## Usage
 
@@ -20,13 +20,13 @@ const client = new Discord.Client();
 client.login("DISCORD_API_KEY");
 
 // Find a channel to send log messages to
-const discordChannel = client.channels.get(discordChannelId)
+const discordChannel = client.channels.get(discordChannelId);
 
 // Create and add the transport to a logger
 const DiscordTransport = require('winston-discordjs');
 logger.add(new DiscordTransport({
     discordChannel: discordChannel
-});
+}));
 ```
 
 ## Options

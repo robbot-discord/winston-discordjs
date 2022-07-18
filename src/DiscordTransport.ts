@@ -3,7 +3,7 @@ import {
   TextChannel,
   Client,
   BitFieldResolvable,
-  IntentsString,
+  GatewayIntentsString,
   Message,
 } from "discord.js"
 import TransportStream from "winston-transport"
@@ -14,7 +14,7 @@ export interface DiscordTransportStreamOptions
   discordClient?: Client
   discordToken?: string
   discordChannel?: string | TextChannel
-  intents?: BitFieldResolvable<IntentsString, number>
+  intents?: BitFieldResolvable<GatewayIntentsString, number>
 }
 
 export class DiscordTransport extends TransportStream {
