@@ -1,6 +1,6 @@
 import { TransformableInfo, Format } from "logform"
 import { isPrimitive, Primitive } from "utility-types"
-import { EmbedBuilder } from "discord.js"
+import { Colors, EmbedBuilder } from "discord.js"
 import { LogLevel, LogLevelToColor } from "./LogLevels"
 
 export const isTransformableInfo = (
@@ -52,8 +52,8 @@ export const handleLogform = (
     const embedBuilder = new EmbedBuilder()
     let logMessageString = ""
     const color = level
-      ? LogLevelToColor[level as LogLevel] ?? "Default"
-      : "Default"
+      ? LogLevelToColor[level as LogLevel] ?? Colors.Default
+      : Colors.Default
     embedBuilder.setColor(color)
     const fields = sortFields(Object.keys(info))
 

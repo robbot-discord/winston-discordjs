@@ -1,5 +1,4 @@
-import type { ColorResolvable } from "discord.js"
-import { Colors } from "discord.js"
+import { ColorResolvable, Colors } from "discord.js"
 
 export type LogLevel =
   | "emerg"
