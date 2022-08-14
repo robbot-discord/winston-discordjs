@@ -1,4 +1,4 @@
-import { ColorResolvable } from "discord.js"
+import { ColorResolvable, Colors } from "discord.js"
 
 export type LogLevel =
   | "emerg"
@@ -11,12 +11,12 @@ export type LogLevel =
   | "debug"
 
 export const LogLevelToColor: Record<LogLevel, ColorResolvable> = {
-  emerg: "RED",
-  alert: "RED",
-  crit: "RED",
-  error: "RED",
-  warning: "YELLOW",
-  notice: "BLUE",
-  info: "BLUE",
-  debug: "GREEN",
+  emerg: Colors.Red,
+  alert: Colors.Red,
+  crit: Colors.Red,
+  error: Colors.Red,
+  warning: Colors.Yellow,
+  notice: Colors.Blue,
+  info: Colors.Blue,
+  debug: Colors.Green,
 }

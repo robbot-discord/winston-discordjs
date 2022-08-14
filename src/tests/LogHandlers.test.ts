@@ -6,14 +6,14 @@ import {
   handleInfo,
 } from "../LogHandlers"
 import * as logform from "logform"
-import { MessageEmbed } from "discord.js"
+import { EmbedBuilder } from "discord.js"
 
 describe("LogHandlers", () => {
   const transformableInfo: logform.TransformableInfo = {
     level: "info",
     message: "hello world",
   }
-  const expectedTransformableInfoResult = new MessageEmbed({
+  const expectedTransformableInfoResult = new EmbedBuilder({
     color: 3447003,
     fields: [
       {
@@ -106,7 +106,7 @@ describe("LogHandlers", () => {
     })
 
     it("handles only TransformableInfo with additional data", () => {
-      const expectedValue = new MessageEmbed({
+      const expectedValue = new EmbedBuilder({
         color: 3447003,
         fields: [
           {
@@ -141,7 +141,7 @@ describe("LogHandlers", () => {
     })
 
     it("handles TransformableInfo with undefined level", () => {
-      const expectedValue = new MessageEmbed({
+      const expectedValue = new EmbedBuilder({
         color: 0,
         fields: [
           {
@@ -184,7 +184,7 @@ describe("LogHandlers", () => {
     })
 
     it("handles TransformableInfo with format", () => {
-      const expectedMessageEmbed = new MessageEmbed({
+      const expectedEmbedBuilder = new EmbedBuilder({
         color: 0,
         fields: [
           // { name: "Timestamp", value: expect.anything(), inline: true },
@@ -203,7 +203,7 @@ describe("LogHandlers", () => {
 
       const expectedValue = [
         expect.stringContaining("hello world"),
-        expectedMessageEmbed,
+        expectedEmbedBuilder,
       ]
 
       expect(

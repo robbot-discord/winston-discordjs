@@ -1,6 +1,6 @@
 import { TransformableInfo, Format } from "logform"
 import { isPrimitive, Primitive } from "utility-types"
-import { MessageEmbed } from "discord.js"
+import { Colors, EmbedBuilder } from "discord.js"
 import { LogLevel, LogLevelToColor } from "./LogLevels"
 
 export const isTransformableInfo = (
@@ -47,14 +47,14 @@ export const handlePrimitive = (info: Primitive): string => {
 export const handleLogform = (
   info: TransformableInfo,
   level?: string
-): [string, MessageEmbed] | undefined => {
+): [string, EmbedBuilder] | undefined => {
   if ((level && level === info.level) || !level) {
-    const messageEmbed = new MessageEmbed()
+    const embedBuilder = new EmbedBuilder()
     let logMessageString = ""
     const color = level
-      ? LogLevelToColor[level as LogLevel] ?? "DEFAULT"
-      : "DEFAULT"
-    messageEmbed.setColor(color)
+      ? LogLevelToColor[level as LogLevel] ?? Colors.Default
+      : Colors.Default
+    embedBuilder.setColor(color)
     const fields = sortFields(Object.keys(info))
 
     for (const field of fields) {
@@ -71,11 +71,13 @@ export const handleLogform = (
         const value = info[field]
 
         logMessageString += `${capitalizedField}: ${value}`
-        messageEmbed.addField(capitalizedField, value.toString(), true)
+        embedBuilder.addFields([
+          { name: capitalizedField, value: value.toString(), inline: true },
+        ])
       }
     }
 
-    return [logMessageString, messageEmbed]
+    return [logMessageString, embedBuilder]
   }
 
   return undefined
@@ -85,7 +87,7 @@ export const handleObject = (
   info: Exclude<any, Primitive>,
   format?: Format,
   level?: string
-): string | [string, MessageEmbed] | undefined => {
+): string | [string, EmbedBuilder] | undefined => {
   if (isTransformableInfo(info)) {
     if (format) {
       const formattedInfo = format.transform(info)
@@ -114,7 +116,7 @@ export const handleInfo = (
   info: unknown,
   format?: Format,
   level?: string
-): string | [string, MessageEmbed] | undefined => {
+): string | [string, EmbedBuilder] | undefined => {
   if (isPrimitive(info)) {
     return handlePrimitive(info)
   } else if (typeof info === "function") {
