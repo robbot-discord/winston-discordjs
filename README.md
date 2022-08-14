@@ -9,7 +9,7 @@ A Winston transport using Discord.js, written in TypeScript
 
 ## Requirements
 
-- Node.js 16.9+
+- Node.js 16.15+
 
 ## Usage
 
